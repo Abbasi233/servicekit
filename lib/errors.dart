@@ -17,6 +17,14 @@ class Errors {
         return 'Girdiğiniz şifre çok zayıf.';
       case 'operation-not-allowed':
         return '(operation-not-allowed): Kullanıcı kayıt sağlayıcısı aktif değil.';
+      case 'account-exists-with-different-credential':
+        return '(account-exists-with-different-credential): Kullanıcı farklı bir yöntemle giriş yapmış olabilir.';
+      case 'invalid-credential':
+        return '(invalid-credential): Kimlik bilgileri hatalı biçimlendirilmiş veya süresi dolmuş.';
+      case 'invalid-verification-code':
+        return 'Doğrulama kodunu hatalı girdiniz.';
+      case 'invalid-verification-id':
+        return '(invalid-verification-id): Doğrulama kimliği geçersiz.';
       case 'unknown':
         return 'Bilinmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
       default:
