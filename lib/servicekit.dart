@@ -61,6 +61,7 @@ abstract class ServiceKit {
     final firstMatch = phoneRegEx.firstMatch(phoneNumber);
     final phoneInCorrectForm = (firstMatch?.group(1)?.isNotEmpty ?? false ? "+${firstMatch!.group(1)!}" : "+90") + firstMatch!.group(2)!;
 
+    await _inst.setSettings(appVerificationDisabledForTesting: true, forceRecaptchaFlow: false);
     await _inst.verifyPhoneNumber(
       timeout: timeout,
       forceResendingToken: 0,
