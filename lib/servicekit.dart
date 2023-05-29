@@ -86,7 +86,8 @@ abstract class ServiceKit {
       var credential = PhoneAuthProvider.credential(smsCode: trimedSmsCode, verificationId: verificationId);
       await _inst.signInWithCredential(credential);
 
-      userDoc.set(userDocumentMap);
+      var doc = await userDoc.get();
+      if (!doc.exists) await userDoc.set(userDocumentMap);
     } on FirebaseAuthException catch (e) {
       onError(Errors.fromFirebase(e));
     }
