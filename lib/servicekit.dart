@@ -80,15 +80,21 @@ abstract class ServiceKit {
     required String verificationId,
     required Map<String, dynamic> userDocumentMap,
     required void Function(String errorMessage) onError,
+    bool savePhoneNumberToUserDoc = false,
   }) async {
     try {
       var trimedSmsCode = smsCode.trim();
       var credential = PhoneAuthProvider.credential(smsCode: trimedSmsCode, verificationId: verificationId);
       await _inst.signInWithCredential(credential);
-      await currentUser?.updatePhoneNumber(credential);
 
       var doc = await userDoc.get();
-      if (!doc.exists) await userDoc.set(userDocumentMap);
+      if (!doc.exists) {
+        if (savePhoneNumberToUserDoc) {
+          userDocumentMap["phone"] = currentUser?.phoneNumber;
+        }
+        await userDoc.set(userDocumentMap);
+      }
+      // currentUser?.updatePhoneNumber(credential);
     } on FirebaseAuthException catch (e) {
       onError(Errors.fromFirebase(e));
     }
