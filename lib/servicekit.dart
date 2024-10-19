@@ -30,10 +30,18 @@ abstract class ServiceKit {
     required String displayName,
     required Map<String, dynamic> userDocumentData,
   }) async {
-    var credential = await _inst.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    UserCredential credential;
+
+    try {
+      credential = await _inst.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
 
     credential.user!.sendEmailVerification();
     credential.user!.updateDisplayName(displayName);
@@ -42,10 +50,16 @@ abstract class ServiceKit {
   }
 
   Future<void> login({required String email, required String password}) async {
-    await _inst.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      await _inst.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
   }
 
   /// Giriş işlemi başarılı olduğunda authStateChanges tetiklenir.
