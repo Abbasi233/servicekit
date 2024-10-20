@@ -89,7 +89,7 @@ abstract class ServiceKit {
     );
   }
 
-  void enterVerificationCode({
+  Future<void> enterVerificationCode({
     required String smsCode,
     required String verificationId,
     required Map<String, dynamic> userDocumentMap,
