@@ -17,7 +17,7 @@ abstract class ServiceKit {
   DocumentReference<Map<String, dynamic>> get userDoc => _userDocRef(uid);
 
   DocumentReference<Map<String, dynamic>> _userDocRef(String uid) {
-    return FirebaseFirestore.instance.collection("users").doc(uid);
+    return FirebaseFirestore.instance.collection("Users").doc(uid);
   }
 
   Future<void> refreshUser() async {
