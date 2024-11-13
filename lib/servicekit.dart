@@ -114,10 +114,7 @@ abstract class ServiceKit {
     }
   }
 
-  Future<void> loginWithGoogle({
-    required Map<String, dynamic> userDocumentMap,
-    required void Function(String errorMessage) onError,
-  }) async {
+  Future<void> loginWithGoogle(Map<String, dynamic> userDocumentMap) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) return;
@@ -141,10 +138,7 @@ abstract class ServiceKit {
     }
   }
 
-  Future<void> loginWithApple({
-    required Map<String, dynamic> userDocumentMap,
-    required void Function(String errorMessage) onError,
-  }) async {
+  Future<void> loginWithApple(Map<String, dynamic> userDocumentMap) async {
     try {
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -165,7 +159,7 @@ abstract class ServiceKit {
         await userDoc.set(userDocumentMap);
       }
     } on FirebaseAuthException catch (e) {
-      onError(Errors.fromFirebase(e));
+      throw Errors.fromFirebase(e);
     } on Exception catch (_) {
       rethrow;
     }
