@@ -1,7 +1,9 @@
 library servicekit;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'errors.dart';
 
@@ -80,12 +82,10 @@ abstract class ServiceKit {
       timeout: timeout,
       forceResendingToken: 0,
       phoneNumber: phoneInCorrectForm,
-      codeSent: (String verificationId, int? resendToken) {
-        codeSent(verificationId, timeout);
-      },
       verificationFailed: (_) {},
       verificationCompleted: (_) {},
       codeAutoRetrievalTimeout: (_) {},
+      codeSent: (String verificationId, int? resendToken) => codeSent(verificationId, timeout),
     );
   }
 
@@ -111,6 +111,63 @@ abstract class ServiceKit {
       // currentUser?.updatePhoneNumber(credential);
     } on FirebaseAuthException catch (e) {
       onError(Errors.fromFirebase(e));
+    }
+  }
+
+  Future<void> loginWithGoogle({
+    required Map<String, dynamic> userDocumentMap,
+    required void Function(String errorMessage) onError,
+  }) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
+      );
+
+      await _inst.signInWithCredential(credential);
+
+      var doc = await userDoc.get();
+      if (!doc.exists) {
+        await userDoc.set(userDocumentMap);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> loginWithApple({
+    required Map<String, dynamic> userDocumentMap,
+    required void Function(String errorMessage) onError,
+  }) async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      await _inst.signInWithCredential(oauthCredential);
+
+      var doc = await userDoc.get();
+      if (!doc.exists) {
+        await userDoc.set(userDocumentMap);
+      }
+    } on FirebaseAuthException catch (e) {
+      onError(Errors.fromFirebase(e));
+    } on Exception catch (_) {
+      rethrow;
     }
   }
 
