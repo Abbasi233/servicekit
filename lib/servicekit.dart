@@ -18,6 +18,8 @@ abstract class ServiceKit {
 
   DocumentReference<Map<String, dynamic>> get userDoc => _userDocRef(uid);
 
+  Future<String?>? get idToken => currentUser?.getIdToken();
+
   DocumentReference<Map<String, dynamic>> _userDocRef(String uid) {
     return FirebaseFirestore.instance.collection("Users").doc(uid);
   }
