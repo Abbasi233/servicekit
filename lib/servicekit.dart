@@ -131,6 +131,7 @@ abstract class ServiceKit {
 
       var doc = await userDoc.get();
       if (!doc.exists) {
+        userDocumentMap["email"] = currentUser?.email;
         await userDoc.set(userDocumentMap);
       }
     } on FirebaseAuthException catch (e) {
@@ -158,6 +159,7 @@ abstract class ServiceKit {
 
       var doc = await userDoc.get();
       if (!doc.exists) {
+        userDocumentMap["email"] = currentUser?.email;
         await userDoc.set(userDocumentMap);
       }
     } on FirebaseAuthException catch (e) {
