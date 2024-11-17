@@ -16,6 +16,8 @@ abstract class ServiceKit {
 
   Stream<User?> get authStateChanges => _inst.authStateChanges();
 
+  Stream<User?> get idTokenChanges => _inst.idTokenChanges();
+
   DocumentReference<Map<String, dynamic>> get userDoc => _userDocRef(uid);
 
   Future<String?>? get idToken => currentUser?.getIdToken();
