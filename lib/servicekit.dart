@@ -173,6 +173,94 @@ abstract class ServiceKit {
     }
   }
 
+  Future<void> linkWithEmail(String email, String password) async {
+    try {
+      if (currentUser != null) {
+        AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
+        await currentUser!.linkWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> linkWithGoogle() async {
+    try {
+      if (currentUser != null) {
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) return;
+
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: googleAuth.accessToken,
+        );
+
+        await currentUser!.linkWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> linkWithApple() async {
+    try {
+      if (currentUser != null) {
+        final appleCredential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+
+        final oauthCredential = OAuthProvider("apple.com").credential(
+          idToken: appleCredential.identityToken,
+          accessToken: appleCredential.authorizationCode,
+        );
+
+        await currentUser!.linkWithCredential(oauthCredential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> linkWithPhone({
+    required String phoneNumber,
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      if (currentUser != null) {
+        var trimedSmsCode = smsCode.trim();
+        var credential = PhoneAuthProvider.credential(smsCode: trimedSmsCode, verificationId: verificationId);
+        await currentUser!.linkWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> unlinkProvider(String providerId) async {
+    try {
+      if (currentUser != null) {
+        await currentUser!.unlink(providerId);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
   Future<void> logout() => _inst.signOut();
 
   Future<bool> deleteAccount() async {
