@@ -248,6 +248,16 @@ abstract class ServiceKit {
     }
   }
 
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _inst.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
   Future<void> unlinkProvider(String providerId) async {
     try {
       if (currentUser != null) {
