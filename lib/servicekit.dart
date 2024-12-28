@@ -120,6 +120,23 @@ abstract class ServiceKit {
     }
   }
 
+  Future<void> linkWithPhone({
+    required String smsCode,
+    required String verificationId,
+  }) async {
+    try {
+      if (currentUser != null) {
+        var trimedSmsCode = smsCode.trim();
+        var credential = PhoneAuthProvider.credential(smsCode: trimedSmsCode, verificationId: verificationId);
+        await currentUser!.linkWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
   Future<void> loginWithGoogle(Map<String, dynamic> userDocumentMap) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -223,24 +240,6 @@ abstract class ServiceKit {
         );
 
         await currentUser!.linkWithCredential(oauthCredential);
-      }
-    } on FirebaseAuthException catch (e) {
-      throw Errors.fromFirebase(e);
-    } on Exception catch (_) {
-      rethrow;
-    }
-  }
-
-  Future<void> linkWithPhone({
-    required String phoneNumber,
-    required String verificationId,
-    required String smsCode,
-  }) async {
-    try {
-      if (currentUser != null) {
-        var trimedSmsCode = smsCode.trim();
-        var credential = PhoneAuthProvider.credential(smsCode: trimedSmsCode, verificationId: verificationId);
-        await currentUser!.linkWithCredential(credential);
       }
     } on FirebaseAuthException catch (e) {
       throw Errors.fromFirebase(e);
