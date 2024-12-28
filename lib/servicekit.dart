@@ -248,6 +248,21 @@ abstract class ServiceKit {
     }
   }
 
+  Future<void> reauthenticateWithEmailCredential(String email, String password) async {
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      await currentUser!.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw Errors.fromFirebase(e);
+    } on Exception catch (_) {
+      rethrow;
+    }
+  }
+
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _inst.sendPasswordResetEmail(email: email);
