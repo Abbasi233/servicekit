@@ -10,6 +10,8 @@ import 'errors.dart';
 abstract class ServiceKit {
   FirebaseAuth get _inst => FirebaseAuth.instance;
 
+  String get collectionName => "Users";
+
   User? get currentUser => _inst.currentUser;
 
   String get uid => currentUser!.uid;
@@ -25,7 +27,7 @@ abstract class ServiceKit {
   Future<String?>? get idToken => currentUser?.getIdToken();
 
   DocumentReference<Map<String, dynamic>> _userDocRef(String uid) {
-    return FirebaseFirestore.instance.collection("Users").doc(uid);
+    return FirebaseFirestore.instance.collection(collectionName).doc(uid);
   }
 
   Future<void> refreshUser() async {
@@ -288,8 +290,8 @@ abstract class ServiceKit {
   Future<void> logout() => _inst.signOut();
 
   Future<bool> deleteAccount() async {
-    await userDoc.delete();
     await currentUser!.delete();
+    await userDoc.delete();
     return true;
   }
 }
