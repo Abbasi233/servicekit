@@ -290,8 +290,8 @@ abstract class ServiceKit {
   Future<void> logout() => _inst.signOut();
 
   Future<bool> deleteAccount() async {
-    await currentUser!.delete();
     await userDoc.delete();
+    await currentUser!.delete();
     return true;
   }
 }
