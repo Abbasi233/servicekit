@@ -1,5 +1,3 @@
-library servicekit;
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -141,13 +139,11 @@ abstract class ServiceKit {
 
   Future<void> loginWithGoogle(Map<String, dynamic> userDocumentMap) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
       );
 
       await _inst.signInWithCredential(credential);
@@ -208,13 +204,11 @@ abstract class ServiceKit {
   Future<void> linkWithGoogle() async {
     try {
       if (currentUser != null) {
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-        if (googleUser == null) return;
+        final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           idToken: googleAuth.idToken,
-          accessToken: googleAuth.accessToken,
         );
 
         await currentUser!.linkWithCredential(credential);
