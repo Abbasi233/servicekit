@@ -78,6 +78,7 @@ abstract class ServiceKit {
     required String phoneNumber,
     required void Function(String verificationId, Duration timeout) codeSent,
     Duration timeout = const Duration(seconds: 60),
+    void Function(Exception exception)? onError,
   }) async {
     final phoneRegEx = RegExp(r"^(?:(?:(?:00|\+)([0-9]\d*))|0|)(\d{11})$");
     final firstMatch = phoneRegEx.firstMatch(phoneNumber);
@@ -88,7 +89,13 @@ abstract class ServiceKit {
       timeout: timeout,
       forceResendingToken: 0,
       phoneNumber: phoneInCorrectForm,
-      verificationFailed: (_) {},
+      verificationFailed: (exception) {
+        print(exception);
+
+        if (onError != null) {
+          onError(exception);
+        }
+      },
       verificationCompleted: (_) {},
       codeAutoRetrievalTimeout: (_) {},
       codeSent: (String verificationId, int? resendToken) => codeSent(verificationId, timeout),
