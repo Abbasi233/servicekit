@@ -208,18 +208,17 @@ abstract class ServiceKit {
     }
   }
 
-  Future<void> linkWithGoogle() async {
+  Future<User?> linkWithGoogle() async {
     try {
-      if (currentUser != null) {
-        final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
+      if (currentUser == null) throw Exception('No user to link.');
 
-        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          idToken: googleAuth.idToken,
-        );
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
 
-        await currentUser!.linkWithCredential(credential);
-      }
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
+
+      final userCredential = await currentUser!.linkWithCredential(credential);
+      return userCredential.user;
     } on FirebaseAuthException catch (e) {
       throw Errors.fromFirebase(e);
     } on Exception catch (_) {
@@ -227,23 +226,24 @@ abstract class ServiceKit {
     }
   }
 
-  Future<void> linkWithApple() async {
+  Future<User?> linkWithApple() async {
     try {
-      if (currentUser != null) {
-        final appleCredential = await SignInWithApple.getAppleIDCredential(
-          scopes: [
-            AppleIDAuthorizationScopes.email,
-            AppleIDAuthorizationScopes.fullName,
-          ],
-        );
+      if (currentUser == null) throw Exception('No user to link.');
 
-        final oauthCredential = OAuthProvider("apple.com").credential(
-          idToken: appleCredential.identityToken,
-          accessToken: appleCredential.authorizationCode,
-        );
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
-        await currentUser!.linkWithCredential(oauthCredential);
-      }
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await currentUser!.linkWithCredential(oauthCredential);
+      return userCredential.user;
     } on FirebaseAuthException catch (e) {
       throw Errors.fromFirebase(e);
     } on Exception catch (_) {
