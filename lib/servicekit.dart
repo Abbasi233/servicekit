@@ -146,7 +146,10 @@ abstract class ServiceKit {
 
   Future<void> loginWithGoogle(Map<String, dynamic> userDocumentMap) async {
     try {
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -212,7 +215,10 @@ abstract class ServiceKit {
     try {
       if (currentUser == null) throw Exception('No user to link.');
 
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance.authenticate();
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
